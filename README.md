@@ -42,6 +42,44 @@ Content-Type: application/JSON
 
 The service will return the PDF document as an attachment file.
 
+### Example with Symfony
+
+An example of simple controller using Symfony.
+
+```php
+/**
+ * @Route("/download", methods={"GET"}, name="download")
+ */
+public function download(HttpClientInterface $client): Response
+{
+    $pdfResponse = $client->request(
+        'POST',
+        'http://pdfGenerator',
+        [
+            'json' => [
+                'content' => '<html><style>h1{color:red}</style><body><h1>Hello world</h1></body></html>',
+            ],
+        ],
+    );
+
+    if ($pdfResponse->getStatusCode() >= 400 && $pdfResponse->getStatusCode() < 500) {
+        throw new LogicException('Invalid request supply to PDF generator. Get status code ' . $pdfResponse->getStatusCode() . '.');
+    }
+    if ($pdfResponse->getStatusCode() >= 500) {
+        throw new ServiceUnavailableHttpException('PDF Generator service is unavailable. Get status code ' . $pdfResponse->getStatusCode() . '.');
+    }
+
+    $response = new Response($pdfResponse->getContent());
+    $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+        ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+        'file.pdf',
+    ));
+    $response->headers->set('Content-Type', $pdfResponse->getHeaders()['content-type']);
+
+    return $response;
+}
+```
+
 ## Security
 
 No specific security are set for this service. It is meant to be integrated into a Docker stack into a private network.
