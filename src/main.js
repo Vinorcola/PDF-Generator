@@ -16,7 +16,7 @@ async function main() {
         return browser
     }
 
-    async function generatePdf(htmlContent) {
+    async function generatePdf(htmlContent, options) {
         // Get a running browser
         let browser = await getBrowser()
 
@@ -27,7 +27,9 @@ async function main() {
 
         // Open a new page and load html
         let page = await context.newPage()
-        await page.setContent(htmlContent)
+        await page.setContent(htmlContent, {
+            waitUntil: options.pageWaitUntil,
+        })
 
         // Generates PDF document
         let pdfContent = await page.pdf({
@@ -45,6 +47,7 @@ async function main() {
     app.post(
         "/",
         body("content").isString(),
+        body("pageWaitUntil").optional().isIn(["domcontentloaded", "load", "networkidle"]),
         async (request, response) => {
             let errors = validationResult(request)
             if (!errors.isEmpty()) {
@@ -52,7 +55,9 @@ async function main() {
                 return
             }
 
-            let pdfContent = await generatePdf(request.body.content)
+            let pdfContent = await generatePdf(request.body.content, {
+                pageWaitUntil: request.body.pageWaitUntil,
+            })
 
             response.setHeader("Content-Type", "application/pdf")
             response.setHeader("Content-Disposition", "attachment; filename=file.pdf")
