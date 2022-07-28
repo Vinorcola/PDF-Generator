@@ -4,7 +4,7 @@ const { chromium } = require("playwright-chromium")
 
 async function main() {
     let app = express()
-    app.use(express.json())
+    app.use(express.json({ limit: "20mb" }))
 
     let browser = await chromium.launch()
     async function getBrowser() {
