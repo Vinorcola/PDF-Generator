@@ -15,7 +15,7 @@ needs to generate PDF documents.
 ## Usage
 
 The usage is pretty simple: you send an HTTP request with the HTML content in the body and receive a PDF document as
-repsonse.
+response.
 
 First, you have to integrate the Docker image into your Docker stack:
 
