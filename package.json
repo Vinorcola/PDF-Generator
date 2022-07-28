@@ -15,8 +15,8 @@
   "author": "Vinorcola",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
-    "express-validator": "^6.12.1",
-    "playwright-chromium": "^1.14.1"
+    "express": "^4.18.1",
+    "express-validator": "^6.14.2",
+    "playwright-chromium": "^1.24.1"
   }
 }
