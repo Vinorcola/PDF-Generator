@@ -2,6 +2,13 @@ const express = require("express")
 const { body, validationResult } = require("express-validator")
 const { chromium } = require("playwright-chromium")
 
+const PRINT_TRIGGERS = ["commit", "domcontentloaded", "load", "networkidle"]
+const DEFAULT_PRINT_TRIGGER = "load"
+const PAPER_FORMATS = ["Letter", "Legal", "Tabloid", "Ledger", "A0", "A1", "A2", "A3", "A4", "A5", "A6"]
+const DEFAULT_PAPER_FORMAT = "A4"
+const PAPER_ORIENTATIONS = ["landscape", "portrait"]
+const DEFAULT_PAPER_ORIENTATION = "portrait"
+
 async function main() {
     let app = express()
     app.use(express.json({ limit: "20mb" }))
@@ -33,7 +40,8 @@ async function main() {
 
         // Generates PDF document
         let pdfContent = await page.pdf({
-            format: "A4",
+            format: options.format,
+            landscape: options.orientation === "landscape",
         })
 
         // Clean browser context
@@ -47,7 +55,9 @@ async function main() {
     app.post(
         "/",
         body("content").isString(),
-        body("pageWaitUntil").optional().isIn(["domcontentloaded", "load", "networkidle"]),
+        body("pageWaitUntil").optional().isIn(PRINT_TRIGGERS),
+        body("format").optional().isIn(PAPER_FORMATS),
+        body("orientation").optional().isIn(PAPER_ORIENTATIONS),
         async (request, response) => {
             let errors = validationResult(request)
             if (!errors.isEmpty()) {
@@ -56,7 +66,9 @@ async function main() {
             }
 
             let pdfContent = await generatePdf(request.body.content, {
-                pageWaitUntil: request.body.pageWaitUntil,
+                pageWaitUntil: request.body.pageWaitUntil ?? DEFAULT_PRINT_TRIGGER,
+                format: request.body.format ?? DEFAULT_PAPER_FORMAT,
+                orientation: request.body.orientation ?? DEFAULT_PAPER_ORIENTATION,
             })
 
             response.setHeader("Content-Type", "application/pdf")
