@@ -13,7 +13,9 @@ async function main() {
     let app = express()
     app.use(express.json({ limit: "20mb" }))
 
-    let browser = await chromium.launch()
+    let browser = await chromium.launch({
+        executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+    })
     async function getBrowser() {
         // Check if browser is still running. If not, start a new browser
         if (!browser.isConnected) {
