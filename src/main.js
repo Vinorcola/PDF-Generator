@@ -80,6 +80,10 @@ async function main() {
         },
     )
 
+    app.get("/health-check", (request, response) => {
+        response.send("OK")
+    })
+
     app.listen(80, "0.0.0.0", () => {
         console.log(`PDF generator service up`)
     })

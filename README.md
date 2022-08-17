@@ -6,8 +6,8 @@ An HTTP service for generating PDF documents from HTML content.
 
 This service is meant to be a PDF document generator from HTML.
 
-It runs an HTTP server (using *Node.js* & *express*) and provide a `POST /` API end-point that accept the HTML content. It
-uses a *Chromium* browser (using *Microsoft Playwright* library) to generate a PDF document.
+It runs an HTTP server (using *Node.js* & *express*) and provide a `POST /` API end-point that accept the HTML content.
+It uses a *Chromium* browser (using *Microsoft Playwright* library) to generate a PDF document.
 
 This service is provided as a Docker image and is meant to be integrated into a Docker stack for an application that
 needs to generate PDF documents.
@@ -95,8 +95,8 @@ reason, the javascript execution is disabled inside the browser used to generate
 You can configure the way Playwright will wait for the page to load before generating the PDF document. Check
 https://playwright.dev/docs/api/class-page/#page-set-content for more details.
 
-Just set the `pageWaitUntil` attribute in your JSON payload with one of the following values: `domcontentloaded`, `load`
-or `networkidle`.
+Just set the `pageWaitUntil` attribute in your JSON payload with one of the following values: `commit`,
+`domcontentloaded`, `load` or `networkidle`.
 
 An example using Symfony.
 
@@ -112,3 +112,31 @@ $client->request(
     ],
 );
 ```
+
+You can also configure page format and orientation. Just set the `format` and/or the `orientation` options.
+
+|Option|Available values|Default value|
+|---|---|---|
+|`format`|`Letter`, `Legal`, `Tabloid`, `Ledger`, `A0`, `A1`, `A2`, `A3`, `A4`, `A5` or `A6`|`A4`|
+|`orienation`|`landscape` or `portrait`|`portrait`|
+
+An example using Symfony.
+
+```php
+$client->request(
+    'POST',
+    'http://pdfGenerator',
+    [
+        'json' => [
+            'content'     => '<html><style>h1{color:red}</style><body><h1>Hello world</h1></body></html>',
+            'format'      => 'Letter',
+            'orientation' => 'landscape',
+        ],
+    ],
+);
+```
+
+## Health check
+
+An health-check end-point is available at `GET /health-check`. It returns an empty response with status `200` to
+indicate the service is still running.
