@@ -9,17 +9,20 @@ const DEFAULT_PAPER_FORMAT = "A4"
 const PAPER_ORIENTATIONS = ["landscape", "portrait"]
 const DEFAULT_PAPER_ORIENTATION = "portrait"
 
+const BROWSER_OPTIONS = {
+    executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+    headless: true,
+}
+
 async function main() {
     let app = express()
     app.use(express.json({ limit: "20mb" }))
 
-    let browser = await chromium.launch({
-        executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
-    })
+    let browser = await chromium.launch(BROWSER_OPTIONS)
     async function getBrowser() {
         // Check if browser is still running. If not, start a new browser
         if (!browser.isConnected) {
-            browser = await chromium.launch()
+            browser = await chromium.launch(BROWSER_OPTIONS)
         }
 
         return browser
