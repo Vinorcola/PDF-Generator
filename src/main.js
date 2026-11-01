@@ -1,6 +1,6 @@
-const express = require("express")
-const { body, validationResult } = require("express-validator")
-const { chromium } = require("playwright-chromium")
+import express from "express"
+import { body, validationResult } from "express-validator"
+import { chromium } from "playwright-chromium"
 
 const PRINT_TRIGGERS = ["commit", "domcontentloaded", "load", "networkidle"]
 const DEFAULT_PRINT_TRIGGER = "load"

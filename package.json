@@ -2,6 +2,7 @@
   "name": "pdf-generator",
   "version": "0.2.0",
   "description": "An HTTP service for generating PDF documents from HTML content.",
+  "type": "module",
   "main": "src/main.js",
   "scripts": {
     "start": "node src/main.js"
