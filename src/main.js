@@ -88,7 +88,22 @@ async function main() {
     )
 
     app.get("/health-check", (request, response) => {
-        response.send("OK")
+        response.json({ ok: true })
+    })
+
+    app.use((request, response) => {
+        response.status(404).json({
+            ok: false,
+            error: "Not found",
+        })
+    })
+
+    app.use((error, request, response, next) => {
+        response.status(error.status ?? 500).json({
+            ok: false,
+            error: error.message ?? "Unknown error.",
+            stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+        })
     })
 
     app.listen(LISTENING_PORT, "0.0.0.0", () => {
