@@ -13,6 +13,7 @@ const BROWSER_OPTIONS = {
     executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
     headless: true,
 }
+const LISTENING_PORT = process.env.PORT ? Number.parseInt(process.env.PORT, 10) : 8080
 
 async function main() {
     let app = express()
@@ -87,7 +88,7 @@ async function main() {
         response.send("OK")
     })
 
-    app.listen(80, "0.0.0.0", () => {
+    app.listen(LISTENING_PORT, "0.0.0.0", () => {
         console.log(`PDF generator service up`)
     })
 }
