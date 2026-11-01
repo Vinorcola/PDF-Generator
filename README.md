@@ -1,13 +1,13 @@
 # PDF generator
 
-An HTTP service for generating PDF documents from HTML content.
+An HTTP service for generating PDF documents from HTML & CSS content.
 
 ## Introduction
 
-This service is meant to be a PDF document generator from HTML.
+This service runs an HTTP server (using *Node.js* & *express*) and provide a `POST /` API end-point that accept the HTML
+document.
 
-It runs an HTTP server (using *Node.js* & *express*) and provide a `POST /` API end-point that accept the HTML content.
-It uses a *Chromium* browser (using *Microsoft Playwright* library) to generate a PDF document.
+It uses a *Chromium* browser (using *Microsoft Playwright* library) to generate a PDF document from HTML content.
 
 This service is provided as a Docker image and is meant to be integrated into a Docker stack for an application that
 needs to generate PDF documents.
@@ -20,16 +20,17 @@ response.
 First, you have to integrate the Docker image into your Docker stack:
 
 ```yaml
-version: "3"
-
 services:
     # Whatever services your app already have
 
     pdfGenerator:
         image: "vinorcola/pdf-generator:latest"
+        environment:
+            LISTENING_PORT: "80" # Defaults to 8080 if env var is not set
 ```
 
-The PDF generator service will be available at `http://pdfGenerator` from other services that share the private network.
+The PDF generator service will be available at `http://pdfGenerator` from other services that share the private
+network.
 
 In order to generate a PDF document, you will need to send an HTTP request with the following JSON content:
 
@@ -40,7 +41,7 @@ Content-Type: application/JSON
 {"content":"<html><head><style>h1{color:red}</style></head><body><h1>Hello world!</h1></body></html>"}
 ```
 
-The service will return the PDF document as an attachment file.
+The service will return the PDF document as an attached file named `file.pdf`.
 
 ### Example with Symfony
 
