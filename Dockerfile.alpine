@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM docker.io/library/node:26-alpine
 
 # Installs latest Chromium package.
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories && \
@@ -21,12 +21,17 @@ ENV CHROME_BIN="/usr/bin/chromium-browser" \
     PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="yes" \
     PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="/usr/bin/chromium-browser"
 
-COPY . /app
 WORKDIR /app
+
+COPY src src
+COPY package.json package.json
+COPY package-lock.json package-lock.json
 
 RUN adduser -D chrome && chown -R chrome:chrome /app
 USER chrome
 
 RUN npm ci
+
+EXPOSE 8080
 
 CMD ["npm", "run", "start"]
