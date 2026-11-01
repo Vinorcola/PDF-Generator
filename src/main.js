@@ -23,6 +23,10 @@ async function main() {
     async function getBrowser() {
         // Check if browser is still running. If not, start a new browser
         if (!browser.isConnected) {
+            // Free previous browser
+            browser.close().catch(() => { })
+
+            // Start new one
             browser = await chromium.launch(BROWSER_OPTIONS)
         }
 
