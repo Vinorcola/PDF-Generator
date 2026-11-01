@@ -16,7 +16,7 @@ const BROWSER_OPTIONS = {
 const LISTENING_PORT = process.env.PORT ? Number.parseInt(process.env.PORT, 10) : 8080
 
 async function main() {
-    let app = express()
+    const app = express()
     app.use(express.json({ limit: "20mb" }))
 
     let browser = await chromium.launch(BROWSER_OPTIONS)
@@ -35,31 +35,30 @@ async function main() {
 
     async function generatePdf(htmlContent, options) {
         // Get a running browser
-        let browser = await getBrowser()
+        const browser = await getBrowser()
 
         // Create a new browser context
-        let context = await browser.newContext({
+        const context = await browser.newContext({
             javaScriptEnabled: false,
         })
 
-        // Open a new page and load html
-        let page = await context.newPage()
-        await page.setContent(htmlContent, {
-            waitUntil: options.pageWaitUntil,
-        })
-
-        // Generates PDF document
-        let pdfContent = await page.pdf({
-            format: options.format,
-            landscape: options.orientation === "landscape",
-        })
-
-        // Clean browser context
         try {
-            await context.close()
-        } catch(error) {}
+            // Open a new page and load html
+            const page = await context.newPage()
+            await page.setContent(htmlContent, {
+                waitUntil: options.pageWaitUntil,
+            })
 
-        return pdfContent
+            // Generates PDF document
+            return await page.pdf({
+                format: options.format,
+                landscape: options.orientation === "landscape",
+            })
+        }
+        finally {
+            // Clean browser context
+            context.close().catch(() => { })
+        }
     }
 
     app.post(
@@ -69,13 +68,13 @@ async function main() {
         body("format").optional().isIn(PAPER_FORMATS),
         body("orientation").optional().isIn(PAPER_ORIENTATIONS),
         async (request, response) => {
-            let errors = validationResult(request)
+            const errors = validationResult(request)
             if (!errors.isEmpty()) {
                 response.status(400).json({ errors: errors.array() })
                 return
             }
 
-            let pdfContent = await generatePdf(request.body.content, {
+            const pdfContent = await generatePdf(request.body.content, {
                 pageWaitUntil: request.body.pageWaitUntil ?? DEFAULT_PRINT_TRIGGER,
                 format: request.body.format ?? DEFAULT_PAPER_FORMAT,
                 orientation: request.body.orientation ?? DEFAULT_PAPER_ORIENTATION,
